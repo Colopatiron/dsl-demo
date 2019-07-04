@@ -46,8 +46,10 @@ module DslDemo
     def to_s
       <<~RECIPE
         #{name}
+
          Ingredients:
         #{ingredients.uniq * "\n"}
+
          Instructions:
         #{instructions.uniq * "\n"}
       RECIPE
