@@ -2,21 +2,22 @@ require "dsl_demo/version"
 
 module DslDemo
   class Recipe
-    @recipes = Hash.new do |hash, key|
-      hash[key] = { ingredients: [], instructions: [] }
+    attr_accessor :name, :ingredients, :instructions
+    @cookbook = []
+
+    def initialize(recipe_name:)
+      @name = recipe_name
+      @ingredients = []
+      @instructions = []
     end
 
     class << self
+      def [](key)
+        @cookbook.find { |recipe| recipe.name == key }
+      end
+
       def for(recipe_name)
-        <<~RECIPE if @recipes.has_key?(recipe_name)
-          #{recipe_name}
-
-          Ingredients:
-          #{@recipes[recipe_name][:ingredients].uniq * "\n"}
-
-          Instructions:
-          #{@recipes[recipe_name][:instructions].uniq * "\n"}
-        RECIPE
+        self.[](recipe_name)
       end
 
       def describe(&blk)
@@ -26,17 +27,30 @@ module DslDemo
       private
 
         def ingredient(ingredient_name)
-          @recipes[@recipe_name][:ingredients] << ingredient_name
+          @recipe.ingredients << ingredient_name
         end
 
         def instruction(instruction_name)
-          @recipes[@recipe_name][:instructions] << instruction_name
+          @recipe.instructions << instruction_name
         end
 
-        def recipe(recipe_name)
-          @recipe_name = recipe_name
-          yield if block_given?
+        def recipe(name)
+          return unless block_given?
+
+          @recipe = Recipe.new(recipe_name: name)
+          yield
+          @cookbook << @recipe
         end
+    end
+
+    def to_s
+      <<~RECIPE
+        #{name}
+         Ingredients:
+        #{ingredients.uniq * "\n"}
+         Instructions:
+        #{instructions.uniq * "\n"}
+      RECIPE
     end
   end
 end
