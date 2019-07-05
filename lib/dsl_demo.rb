@@ -17,7 +17,7 @@ module DslDemo
       end
 
       def for(recipe_name)
-        self.[](recipe_name)
+        self[recipe_name]
       end
 
       def describe(&blk)
